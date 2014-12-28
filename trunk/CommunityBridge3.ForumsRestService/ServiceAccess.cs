@@ -163,9 +163,12 @@ namespace CommunityBridge3.ForumsRestService
 
         protected T DoRequest<T>(string restPath, IDictionary<string, string> parameters, int? page = null, int? pageSize = null, bool ignoreErrorOn404 = false) where T : Response
         {
+            Stopwatch sw = Stopwatch.StartNew();
             var req = CreateRequest(restPath, parameters, page, pageSize);
 
-            return GetResponse<T>(req, ignoreErrorOn404);
+            T res = GetResponse<T>(req, ignoreErrorOn404);
+            Traces.WebService_TraceEvent(TraceEventType.Information, 1, string.Format("RequestTime: {0} ms", sw.ElapsedMilliseconds));
+            return res;
         }
 
         protected T2 DoPost<T1, T2>(string restPath, T1 data) where T2: Response

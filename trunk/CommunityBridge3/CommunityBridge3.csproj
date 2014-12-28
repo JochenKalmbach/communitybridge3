@@ -203,9 +203,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Newsgroups.sdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Newsgroups.sdf" />
     <Resource Include="Resources\CommunityBridge3.png" />
     <Resource Include="Resources\CommunityBridge3.ico" />
   </ItemGroup>

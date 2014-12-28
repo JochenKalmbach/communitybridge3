@@ -751,7 +751,7 @@ namespace CommunityBridge3
             Body = thread.Body + mhStr;
         }
 
-        public ForumArticle(ForumNewsgroup g, Mapping mapping, ThreadReply reply)
+        public ForumArticle(ForumNewsgroup g, Mapping mapping, ThreadReply reply, Thread parentThread)
             : base((int)mapping.NNTPMessageNumber)
         {
 #if DEBUG
@@ -803,6 +803,9 @@ namespace CommunityBridge3
             var mhStr = new StringBuilder();
             mhStr.Append("<br/>-----<br/>");
             mhStr.Append("<strong>REPLY</strong>");
+
+            if ((parentThread != null) && (string.IsNullOrEmpty(parentThread.WebUrl) == false))
+                mhStr.AppendFormat("<br/>Link: <a href='{0}'>{0}</a>", parentThread.WebUrl);
 
             /*            if (string.IsNullOrEmpty(reply.WebUrl) == false)
                             mhStr.AppendFormat("<br/>Link: <a href='{0}'>{0}</a>", thread.WebUrl);
@@ -889,7 +892,7 @@ namespace CommunityBridge3
     /// </remarks>
     internal class MsgNumberManagement
     {
-        public MsgNumberManagement(string basePath, ForumsRestService.ServiceAccess service)
+        public MsgNumberManagement(string basePath, ServiceAccess service)
         {
             _Service = service;
             _baseDir = System.IO.Path.Combine(basePath, "Data");
@@ -903,7 +906,7 @@ namespace CommunityBridge3
 
         private readonly LocalDbAccess _db;
         private readonly string _baseDir;
-        private readonly ForumsRestService.ServiceAccess _Service;
+        private readonly ServiceAccess _Service;
 
         /// <summary>
         /// Sets the max. Msg# and the number of messages for the given forum. It returns <c>false</c> if there are no messages stored for this forum.
@@ -942,9 +945,9 @@ namespace CommunityBridge3
         {
             using (var con = _db.CreateConnection(group.GroupName))
             {
-                if (con.Mappings.Any(p => p.LastActivityDate != null) == false)
+                if (con.Mappings.Any(p => p.LastActivityDate != null && p.PostType == PostTypeThread) == false)
                     return null;
-                var dt = con.Mappings.Where(p => p.LastActivityDate != null).Max(p => p.LastActivityDate.Value);
+                var dt = con.Mappings.Where(p => p.LastActivityDate != null && p.PostType == PostTypeThread).Max(p => p.LastActivityDate.Value);
                 return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, DateTimeKind.Utc);
             }
         }
@@ -965,6 +968,8 @@ namespace CommunityBridge3
             // Lock on the group...
             lock (group)
             {
+                Stopwatch sw = Stopwatch.StartNew();
+
                 // result list...
                 var articles = new List<ForumArticle>();
 
@@ -1011,6 +1016,8 @@ namespace CommunityBridge3
                         }
                     }
                 }
+
+                Traces.Main_TraceEvent(TraceEventType.Information, 1, string.Format("UpdateGroup: {0} ms", sw.ElapsedMilliseconds));
 
                 return articles;
             } // lock
@@ -1210,7 +1217,7 @@ namespace CommunityBridge3
                                                                     map2.Id
                                                  );
 
-                                             var q2 = new ForumArticle(group, map2, reply);
+                                             var q2 = new ForumArticle(group, map2, reply, thread);
                                              lock (result)
                                              {
                                                  result.Add(q2);
@@ -1274,7 +1281,7 @@ namespace CommunityBridge3
                         Traces.Main_TraceEvent(TraceEventType.Information, 1, "GetThreadReplies: id:{0}", map.PostId);
                         if (q != null)
                         {
-                            return new ForumArticle(group, map, q);
+                            return new ForumArticle(group, map, q, null);
                         }
                         return null;
                     }
@@ -1323,7 +1330,7 @@ namespace CommunityBridge3
                         if (map != null)
                         {
                             Traces.Main_TraceEvent(TraceEventType.Information, 1, "GetReplies: id:{0}", map.PostId);
-                            res.Add(new ForumArticle(group, map, reply));
+                            res.Add(new ForumArticle(group, map, reply, null));
                             replies.Remove(map);
                         }
                     }
