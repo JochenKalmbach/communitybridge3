@@ -47,6 +47,7 @@ namespace CommunityBridge3
         private UserSettings()
         {
             DisableArticleCache = false;
+            AsyncGroupUpdate = true;
 #if LIVECONNECT
           Scopes = "wl.signin wl.offline_access";
           ClientId = "000000004C133C0B";
@@ -91,6 +92,7 @@ namespace CommunityBridge3
             u._tabAsSpace = this._tabAsSpace;
             u.DisableArticleCache = this.DisableArticleCache;
             u._maxPagesOnGet = this._maxPagesOnGet;
+            u.AsyncGroupUpdate = this.AsyncGroupUpdate;
 
             return u;
         }
@@ -256,6 +258,10 @@ namespace CommunityBridge3
                     b = GetBoolean(r, "DisableArticleCache");
                     if (b.HasValue)
                         DisableArticleCache = b.Value;
+
+                    b = GetBoolean(r, "AsyncGroupUpdate");
+                    if (b.HasValue)
+                        AsyncGroupUpdate = b.Value;
                 }
             }
             catch (Exception exp)
@@ -308,7 +314,9 @@ namespace CommunityBridge3
                     SetInt32(r, "TabAsSpace", TabAsSpace);
 
                     SetBoolean(r, "DisableArticleCache", DisableArticleCache);
-               }
+
+                    SetBoolean(r, "AsyncGroupUpdate", AsyncGroupUpdate);
+                }
             }
             catch (Exception exp)
             {
@@ -732,6 +740,11 @@ namespace CommunityBridge3
         [DefaultValue(false)]
         [Description("If this is true, all articles will be retrived from the web-service. No article will be cached in the bridge! This will increase the time to get an article, depending on the way the newsreader requests the article, but you will always get the newest version of the article.")]
         public bool DisableArticleCache { get; set; }
+
+        [Category("General")]
+        [DefaultValue(true)]
+        [Description("If this is true, all articles will be fetched in the background. This means that you must update the group twice, in order to get the newest results")]
+        public bool AsyncGroupUpdate { get; set; }
 
         #endregion
     }  // class UserSettings

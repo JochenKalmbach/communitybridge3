@@ -55,75 +55,71 @@ namespace CommunityBridge3
         protected override bool LoadNewsgroupsToStream(Action<Newsgroup> groupAction)
         {
             bool res = true;
-            lock (this)
+            if (IsNewsgroupCacheValid())
             {
-                if (IsNewsgroupCacheValid())
-                {
-                    // copy the list to a local list, so we do not need the lock for the callback
-                    List<Newsgroup> localGroups;
-                    lock (GroupList)
-                    {
-                        localGroups = new List<Newsgroup>(GroupList.Values);
-                    }
-                    if (groupAction != null)
-                    {
-                        foreach (var g in localGroups)
-                            groupAction(g);
-                    }
-                    return true;
-                }
-
-                //var file = new System.IO.StreamWriter("forumsOld.txt");
-
-                // INFO: Always return every group...
-                //var internalList = new Dictionary<string, Newsgroup>(StringComparer.InvariantCultureIgnoreCase);
-                var internalList = new List<Newsgroup>();
-
-                try
-                {
-                    _Service.GetForums(forums =>
-                        {
-                            foreach (ForumsRestService.Forum forum in forums)
-                            {
-                                var bAdded = false;
-                                var g = new ForumNewsgroup(forum, _Service);
-                                if (
-                                    internalList.Any(
-                                        p2 =>
-                                        string.Equals(g.GroupName, p2.GroupName,
-                                                      StringComparison.InvariantCultureIgnoreCase)) ==
-                                    false)
-                                {
-                                    internalList.Add(g);
-                                    bAdded = true;
-                                }
-
-                                if ((bAdded) && (groupAction != null))
-                                    groupAction(g);
-                            }
-                        });
-                }
-                catch (Exception exp)
-                {
-                    res = false;
-                    Traces.Main_TraceEvent(TraceEventType.Error, 1,
-                                           "Error during LoadNewsgroupsToStream: {0}",
-                                           NNTPServer.Traces.ExceptionToString(exp));
-                }
-
-                // Now take all the groups into my own list...
+                // copy the list to a local list, so we do not need the lock for the callback
+                List<Newsgroup> localGroups;
                 lock (GroupList)
                 {
-                    foreach (var g in internalList)
-                    {
-                        if (GroupList.ContainsKey(g.GroupName) == false)
-                            GroupList.Add(g.GroupName, g);
-                    }
+                    localGroups = new List<Newsgroup>(GroupList.Values);
                 }
+                if (groupAction != null)
+                {
+                    foreach (var g in localGroups)
+                        groupAction(g);
+                }
+                return true;
+            }
 
+            var internalList = new List<Newsgroup>();
+
+            try
+            {
+                _Service.GetForums(forums =>
+                    {
+                        foreach (Forum forum in forums)
+                        {
+                            var bAdded = false;
+                            var g = new ForumNewsgroup(forum, _Service);
+                            if (
+                                internalList.Any(
+                                    p2 =>
+                                    string.Equals(g.GroupName, p2.GroupName,
+                                                  StringComparison.InvariantCultureIgnoreCase)) ==
+                                false)
+                            {
+                                internalList.Add(g);
+                                bAdded = true;
+                            }
+
+                            if ((bAdded) && (groupAction != null))
+                                groupAction(g);
+                        }
+                    });
+            }
+            catch (Exception exp)
+            {
+                res = false;
+                Traces.Main_TraceEvent(TraceEventType.Error, 1,
+                                       "Error during LoadNewsgroupsToStream: {0}",
+                                       NNTPServer.Traces.ExceptionToString(exp));
+            }
+
+            // Now take all the groups into my own list...
+            bool cacheValid = false;
+            lock (GroupList)
+            {
+                foreach (Newsgroup g in internalList)
+                {
+                    if (GroupList.ContainsKey(g.GroupName) == false)
+                        GroupList.Add(g.GroupName, g);
+                }
                 if (GroupList.Count > 0)
-                    SetNewsgroupCacheValid();
-            } // lock
+                    cacheValid = true;
+            }
+
+            if (cacheValid)
+                SetNewsgroupCacheValid();
 
             return res;
         }
@@ -138,13 +134,10 @@ namespace CommunityBridge3
         public override bool GetNewsgroupListFromDate(string clientUsername, DateTime fromDate,
                                                       Action<Newsgroup> groupAction)
         {
-            //// For now, we just return the whole list; I have not stored the group-data in a database...
-            //return GetNewsgroupListToStream(clientUsername, groupAction);
             // Just return! We do not support this currently...
             return true;
         }
 
-        // 
         /// <summary>
         /// 
         /// </summary>
@@ -169,6 +162,8 @@ namespace CommunityBridge3
 
             if (cachedGroup == null)
             {
+                // TODO: Make this async!? and return "exceptionOccured=true;" in the meantime?
+
                 OnProgressData(groupName, "Fetching group information...");
                 // Group not found...
                 // Try to search for the group...
@@ -184,6 +179,7 @@ namespace CommunityBridge3
                     {
                         Traces.Main_TraceEvent(TraceEventType.Error, 0, NNTPServer.Traces.ExceptionToString(exp));
                         exceptionOccured = true;
+                        OnProgressData(groupName, string.Format("Exception: {0}", exp.Message));
                         return null;
                     }
                     if (forum != null)
@@ -210,16 +206,18 @@ namespace CommunityBridge3
             // If we just need the group without actual data, then return the cached group
             if (updateFirstLastNumber == false)
                 return cachedGroup;
-
-            try
+            if (UserSettings.Default.AsyncGroupUpdate)
             {
-                _management.UpdateGroupFromWebService(cachedGroup, OnProgressData, ConvertNewArticleFromWebService);
+                OnProgressData(groupName, "Update async...");
+                cachedGroup.StartUpdateTaskIfNeeded(_management, OnProgressData, ConvertNewArticleFromWebService);
             }
-            catch (Exception exp)
+            else
             {
-                Traces.Main_TraceEvent(TraceEventType.Error, 0, NNTPServer.Traces.ExceptionToString(exp));
-                exceptionOccured = true;
-                return null;
+                OnProgressData(groupName, "Update sync...");
+                cachedGroup.UpdateTaskBody(_management, OnProgressData, ConvertNewArticleFromWebService,
+                                           out exceptionOccured);
+                if (exceptionOccured)
+                    return null;
             }
 
             return cachedGroup;
@@ -240,10 +238,13 @@ namespace CommunityBridge3
             {
                 bool exceptionOccured;
                 res = GetNewsgroup(null, groupName, false, out exceptionOccured) as ForumNewsgroup;
-                lock (GroupList)
+                if (res != null)
                 {
-                    if (GroupList.ContainsKey(groupName) == false)
-                        GroupList[groupName] = res;
+                    lock (GroupList)
+                    {
+                        if (GroupList.ContainsKey(groupName) == false)
+                            GroupList[groupName] = res;
+                    }
                 }
             }
 
@@ -289,15 +290,17 @@ namespace CommunityBridge3
             }
 
             ForumArticle art = _management.GetMessageById(g, postId);
-
-            ConvertNewArticleFromWebService(art);
-
-            // Only store the message if the Msg# is correct!
-            if (UserSettings.Default.DisableArticleCache == false)
+            if (art != null)
             {
-                lock (g.Articles)
+                ConvertNewArticleFromWebService(art);
+
+                // Only store the message if the Msg# is correct!
+                if (UserSettings.Default.DisableArticleCache == false)
                 {
-                    g.Articles[art.Number] = art;
+                    lock (g.Articles)
+                    {
+                        g.Articles[art.Number] = art;
+                    }
                 }
             }
             return art;
@@ -418,6 +421,12 @@ namespace CommunityBridge3
                 {
                     if (g.ArticlesAvailable == false)
                     {
+                        if (UserSettings.Default.AsyncGroupUpdate)
+                        {
+                            bool exceptionOccured;
+                            GetNewsgroup(null, groupName, true, out exceptionOccured);
+                            return;
+                        }
                         // If we never had checked for acrticles, we first need to do this...
                         _management.UpdateGroupFromWebService(g, OnProgressData, ConvertNewArticleFromWebService);
                     }
@@ -465,7 +474,7 @@ namespace CommunityBridge3
                     if (missingArticles.Count > 0)
                     {
                         // First process the missing articles...
-                        var articles = _management.GetMessageStreamByMsgNo(g, missingArticles);
+                        IEnumerable<ForumArticle> articles = _management.GetMessageStreamByMsgNo(g, missingArticles);
                         foreach (Article article in articles)
                         {
                             ConvertNewArticleFromWebService(article);
@@ -636,10 +645,41 @@ namespace CommunityBridge3
         //internal string Brand;
         internal string UniqueName;
 
+        internal object UpdateTaskSync = new object();
+        internal Task UpdateTask = Task.Factory.StartNew(() => {});
+
         /// <summary>
         /// If this is "false", then this group had never asked for articles!
         /// </summary>
         public bool ArticlesAvailable { get; set; }
+
+        internal bool StartUpdateTaskIfNeeded(MsgNumberManagement management, Action<string, string> progress, Action<Article> converter)
+        {
+            bool ret = false;
+            lock (UpdateTaskSync)
+            {
+                if (UpdateTask.IsCompleted)
+                {
+                    bool exceptionOccured;
+                    UpdateTask = UpdateTask.ContinueWith(t => UpdateTaskBody(management, progress, converter, out exceptionOccured));
+                    ret = true;
+                }
+            }
+            return ret;
+        }
+        internal void UpdateTaskBody(MsgNumberManagement management, Action<string, string> progress, Action<Article> converter, out bool exceptionOccured)
+        {
+            exceptionOccured = false;
+            try
+            {
+                management.UpdateGroupFromWebService(this, progress, converter);
+            }
+            catch (Exception exp)
+            {
+                exceptionOccured = true;
+                Traces.Main_TraceEvent(TraceEventType.Error, 0, NNTPServer.Traces.ExceptionToString(exp));
+            }
+        }
     }
 
     // class ForumNewsgroup
@@ -886,31 +926,28 @@ namespace CommunityBridge3
         /// </summary>
         /// <param name="group"></param>
         /// <returns></returns>
-        public bool GetMaxMessageNumber(ForumNewsgroup group)
+        private bool GetMaxMessageNumber(ForumNewsgroup group)
         {
-            lock (group)
+            // false: prevent the database from being created if it does not yet exist
+            using (var con = _db.CreateConnection(group.GroupName, false))
             {
-                // false: prevent the database from being created if it does not yet exist
-                using (var con = _db.CreateConnection(group.GroupName, false))
+                if (con == null)
                 {
-                    if (con == null)
-                    {
-                        group.ArticlesAvailable = false;
-                        return false;
-                    }
-                    if (con.Mappings.Any() == false)
-                    {
-                        group.ArticlesAvailable = false;
-                        return false;
-                    }
-                    long min = con.Mappings.Min(p => p.NNTPMessageNumber);
-                    long max = con.Mappings.Max(p => p.NNTPMessageNumber);
-                    group.FirstArticle = (int)min;
-                    group.LastArticle = (int)max;
-                    group.NumberOfArticles = (int)(max - min);
-                    group.ArticlesAvailable = true;
-                    return true;
+                    group.ArticlesAvailable = false;
+                    return false;
                 }
+                if (con.Mappings.Any() == false)
+                {
+                    group.ArticlesAvailable = false;
+                    return false;
+                }
+                long min = con.Mappings.Min(p => p.NNTPMessageNumber);
+                long max = con.Mappings.Max(p => p.NNTPMessageNumber);
+                group.FirstArticle = (int)min;
+                group.LastArticle = (int)max;
+                group.NumberOfArticles = (int)(max - min);
+                group.ArticlesAvailable = true;
+                return true;
             }
         }
 
@@ -939,21 +976,24 @@ namespace CommunityBridge3
         public IEnumerable<ForumArticle> UpdateGroupFromWebService(ForumNewsgroup group, Action<string, string> progress, Action<ForumArticle> articleConverter)
         {
             // Lock on the group...
+            Stopwatch sw = Stopwatch.StartNew();
+            // result list...
+            var articles = new List<ForumArticle>();
+            bool articlesAvailable;
+            DateTime? lastActivityDateTime;
             lock (group)
             {
-                Stopwatch sw = Stopwatch.StartNew();
-
-                // result list...
-                var articles = new List<ForumArticle>();
-
                 // First get the Msg# from the local mapping table:
                 GetMaxMessageNumber(group);
+                articlesAvailable = group.ArticlesAvailable;
+                lastActivityDateTime = GetLastActivityDateForQuestions(group);
+            }
 
-                DateTime? lastActivityDateTime = GetLastActivityDateForQuestions(group);
-
+            try
+            {
                 IEnumerable<ForumArticle> newArticles;
                 bool firstTime = false;
-                if ((group.ArticlesAvailable == false) || (lastActivityDateTime == null))
+                if ((articlesAvailable == false) || (lastActivityDateTime == null))
                 {
                     // It is the first time, we are asking articles from this newsgroup
                     firstTime = true;
@@ -964,14 +1004,27 @@ namespace CommunityBridge3
                     // Es gibt schon Einträge, also frage nach der letzten Abfrage:
                     newArticles = GetThreadsAndReplies(group, lastActivityDateTime, progress);
                 }
-                ProcessNewArticles(group, newArticles, articles, firstTime);
 
-                // Aktualisiere die Msg-Numbers
-                GetMaxMessageNumber(group);
+                // Update the database... so here we need to lock the group, for accessing the database ;)
+                lock (group)
+                {
+                    ProcessNewArticles(group, newArticles, articles, firstTime);
+                }
 
+                int first, last, number;
+                lock (group)
+                {
+                    // Aktualisiere die Msg-Numbers
+                    GetMaxMessageNumber(group);
+                    first = group.FirstArticle;
+                    last = group.LastArticle;
+                    number = group.NumberOfArticles;
+                }
                 if (progress != null)
                 {
-                    progress(group.GroupName, string.Format(CultureInfo.InvariantCulture, "Update threads finished ({0}-{1}: {2})", group.FirstArticle, group.LastArticle, group.NumberOfArticles));
+                    progress(group.GroupName,
+                             string.Format(CultureInfo.InvariantCulture, "Update threads finished ({0}-{1}: {2})",
+                                           first, last, number));
                 }
 
                 if (UserSettings.Default.DisableArticleCache == false)
@@ -981,7 +1034,6 @@ namespace CommunityBridge3
                         if (articleConverter != null)
                         {
                             articleConverter(a);
-                            //ConvertNewArticleFromWebService(a);
                         }
                         lock (group.Articles)
                         {
@@ -990,10 +1042,16 @@ namespace CommunityBridge3
                     }
                 }
 
-                Traces.Main_TraceEvent(TraceEventType.Information, 1, string.Format("UpdateGroup: {0} ms", sw.ElapsedMilliseconds));
+                Traces.Main_TraceEvent(TraceEventType.Information, 1,
+                                       string.Format("UpdateGroup: {0} ms", sw.ElapsedMilliseconds));
+            }
+            catch (Exception exp)
+            {
+                Traces.Main_TraceEvent(TraceEventType.Information, 1,
+                                       string.Format("UpdateGroup:Exception: {0}", NNTPServer.Traces.ExceptionToString(exp)));
+            }
 
-                return articles;
-            } // lock
+            return articles;
         }
 
         private void ProcessNewArticles(ForumNewsgroup group, IEnumerable<ForumArticle> newArticles, List<ForumArticle> articles, bool firstTime = false)
