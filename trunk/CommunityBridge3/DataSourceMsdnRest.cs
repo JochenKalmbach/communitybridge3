@@ -531,11 +531,18 @@ namespace CommunityBridge3
                 //}
 
                 // Check if this is a new post or a reply:
+                Guid? userId = null;
                 if (string.IsNullOrEmpty(a.References))
                 {
-                    Traces.Main_TraceEvent(TraceEventType.Verbose, 1, "CreateThread: ForumId: {0}, Subject: {1}, Content: {2}", g.GroupName, a.Subject, a.Body);
+                    Traces.Main_TraceEvent(TraceEventType.Verbose, 1,
+                                           "CreateThread: ForumId: {0}, Subject: {1}, Content: {2}", g.GroupName,
+                                           a.Subject, a.Body);
                     // Create a new thread
-                    _Service.PostThread(g.UniqueName, a.Subject, a.Body);
+                    Thread t = _Service.PostThread(g.UniqueName, a.Subject, a.Body);
+                    if ((t != null) && (t.CreatedBy != null))
+                    {
+                        userId = t.CreatedBy.Id;
+                    }
                 }
                 else
                 {
@@ -554,84 +561,48 @@ namespace CommunityBridge3
                         parentId = res.MappingValue.PostId;
                     }
 
-                    Traces.Main_TraceEvent(TraceEventType.Verbose, 1, "CreateReply: Forum: {0}, ThreadId: {1}, ParentId: {2}, Content: {3}", g.GroupName, threadId, parentId, a.Body);
+                    Traces.Main_TraceEvent(TraceEventType.Verbose, 1,
+                                           "CreateReply: Forum: {0}, ThreadId: {1}, ParentId: {2}, Content: {3}",
+                                           g.GroupName, threadId, parentId, a.Body);
 
-                    _Service.PostReply(threadId, a.Body, parentId);
+                    ThreadReply tr = _Service.PostReply(threadId, a.Body, parentId);
+                    if ((tr != null) && (tr.CreatedBy != null))
+                    {
+                        userId = tr.CreatedBy.Id;
+                    }
                 }
 
-                //// Auto detect my email and username (guid):
-                //try
-                //{
-                //    // Try to find the email address in the post:
-                //    var m = emailFinderRegEx.Match(a.From);
-                //    if (m.Success)
-                //    {
-                //        string userName = m.Groups[1].Value.Trim(' ', '<', '>');
-                //        string email = m.Groups[3].Value;
+                if (userId.HasValue && userId.Value == Guid.Empty)
+                {
+                    userId = null;
+                }
 
-                //        // try to find this email in the usermapping collection:
-                //        bool bFound = false;
-                //        lock (UserSettings.Default.UserMappings)
+                // The userId does not work currently, because there is no way to get the correct id...
+                //if (userId != null && UserSettings.Default.UserGuid == null)
+                //{
+                //    // Auto detect my email and username (guid):
+                //    try
+                //    {
+                //        // Try to find the email address in the post:
+                //        var m = emailFinderRegEx.Match(a.From);
+                //        if (m.Success)
                 //        {
-                //            foreach (var um in UserSettings.Default.UserMappings)
-                //            {
-                //                if (string.Equals(um.UserEmail, email,
-                //                    StringComparison.InvariantCultureIgnoreCase))
-                //                {
-                //                    // Address is already known...
-                //                    bFound = true;
-                //                    break;
-                //                }
-                //            }
-                //        }
-                //        if (bFound == false)
-                //        {
-                //            // I have not yet this email address, so find the user guid for the just posted article:
-                //            // INFO: The article is not yet in the cache, so we have no Msg#!
-                //            var a2 = GetArticleByIdInternal(g, myThreadGuid, null, false);
-                //            if (a2 != null)
-                //            {
-                //                var userGuid = a2.UserGuid;
-                //                // Now store the data in the user settings
-                //                bool bGuidFound = false;
-                //                lock (UserSettings.Default.UserMappings)
-                //                {
-                //                    foreach (var um in UserSettings.Default.UserMappings)
-                //                    {
-                //                        if (um.Id == userGuid)
-                //                        {
-                //                            bGuidFound = true;
-                //                            um.UserEmail = email;
-                //                        }
-                //                    }
-                //                    if (bGuidFound == false)
-                //                    {
-                //                        var um = new UserMapping();
-                //                        um.Id = userGuid;
-                //                        um.UserEmail = email;
-                //                        if ((string.IsNullOrEmpty(a2.DisplayName) == false) && (a2.DisplayName.Contains("<null>") == false))
-                //                            um.UserName = a2.DisplayName;
-                //                        else
-                //                        {
-                //                            if (string.IsNullOrEmpty(userName) == false)
-                //                                um.UserName = userName;
-                //                        }
-                //                        if (string.IsNullOrEmpty(um.UserName) == false)
-                //                            UserSettings.Default.UserMappings.Add(um);
-                //                    }
-                //                }  // lock
-                //            }
+                //            //string userName = m.Groups[1].Value.Trim(' ', '<', '>');
+                //            string email = m.Groups[3].Value;
+                //            UserSettings.Default.UserEmail = email;
+                //            UserSettings.Default.Save();
                 //        }
                 //    }
-                //}
-                //catch (Exception exp)
-                //{
-                //    Traces.Main_TraceEvent(TraceEventType.Error, 1, "Error in retrieving own article: {0}", NNTPServer.Traces.ExceptionToString(exp));
+                //    catch (Exception exp)
+                //    {
+                //        Traces.Main_TraceEvent(TraceEventType.Error, 1, "Error in retrieving own article: {0}",
+                //                               NNTPServer.Traces.ExceptionToString(exp));
+                //    }
                 //}
             }
         }
 
-        Regex emailFinderRegEx = new Regex(@"^(.*(\s|<))([a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)(>|s|$)",
+        readonly Regex emailFinderRegEx = new Regex(@"^(.*(\s|<))([a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)(>|s|$)",
             RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
         #endregion
@@ -694,12 +665,13 @@ namespace CommunityBridge3
             if (thread.CreatedBy != null)
             {
                 author = thread.CreatedBy.DisplayName;
+                UserGuid = thread.CreatedBy.Id;
             }
             if (string.IsNullOrEmpty(author))
                 author = "Unknown <null>";
 
             From = author;
-            //DisplayName = author;
+            DisplayName = author;
 
             // It is the "primary" question
             string sub = string.Empty;
@@ -770,12 +742,13 @@ namespace CommunityBridge3
             if (reply.CreatedBy != null)
             {
                 author = reply.CreatedBy.DisplayName;
+                UserGuid = reply.CreatedBy.Id;
             }
             if (string.IsNullOrEmpty(author))
                 author = "Unknown <null>";
 
             From = author;
-            //DisplayName = author;
+            DisplayName = author;
 
             // It is the "primary" question
             string sub = string.Empty;
@@ -1149,8 +1122,8 @@ namespace CommunityBridge3
             int maxIdx = res.Count();
 
             //foreach (Thread thread in res)
-            try
-            {
+            //try
+            //{
                 Parallel.ForEach(res,
                     new ParallelOptions { MaxDegreeOfParallelism = 4 },
                                  (thread, loopState) =>
@@ -1172,6 +1145,9 @@ namespace CommunityBridge3
                                                             thread.Id, map.Id);
 
                                      var q = new ForumArticle(group, map, thread);
+
+                                     var intList = new List<ForumArticle>();
+                                     intList.Add(q);
 
                                      // Now get all responces...
                                      // Only query the replies, if there are some...
@@ -1218,24 +1194,18 @@ namespace CommunityBridge3
                                                  );
 
                                              var q2 = new ForumArticle(group, map2, reply, thread);
-                                             lock (result)
-                                             {
-                                                 result.Add(q2);
-                                             }
+                                             intList.Add(q2);
                                          }
                                      }
                                      // Add the article after we fetched successfully the replies!
                                      lock (result)
                                      {
-                                         result.Add(q);
+                                         result.AddRange(intList);
                                      }
                                  }
                     );
-            }
-            catch (AggregateException aexp)
-            {
-                throw;
-            }
+            //}
+            //catch (AggregateException aexp) { throw; }
 
 
             return result;

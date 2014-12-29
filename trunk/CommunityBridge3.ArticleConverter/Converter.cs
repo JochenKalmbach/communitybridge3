@@ -34,7 +34,6 @@ namespace CommunityBridge3.ArticleConverter
         public bool UseCodeColorizer { get; set; }
         public int AutoLineWrap { get; set; }
         public UserDefinedTagCollection UserDefinedTags { get; set; }
-        public bool ShowUserNamePostfix { get; set; }
         public bool PostsAreAlwaysFormatFlowed { get; set; }
         public int TabAsSpace { get; set; }
 
@@ -77,7 +76,6 @@ namespace CommunityBridge3.ArticleConverter
             {
                 a.Subject = "Re: " + a.Subject;
             }
-
 
             // Find Newsreader Tag
             FindNewsreaderTag(a);
@@ -154,22 +152,19 @@ namespace CommunityBridge3.ArticleConverter
 
             // From:
 
-            //// INFO: Only encode the username and *not* the email address
-            //if (string.IsNullOrEmpty(a.UserEmail) == false)
-            //{
-            //    a.From = string.Format("{0} <{1}>", EncodeHeaderText(a.DisplayName, enc), a.UserEmail);
-            //}
-            //else
-            //{
+            // INFO: Only encode the username and *not* the email address
+            if (string.IsNullOrEmpty(a.UserEmail) == false)
+            {
+                a.From = string.Format("{0} <{1}>", EncodeHeaderText(a.DisplayName, enc), a.UserEmail);
+            }
+            else
+            {
             //    // Only use the additons for display names that are not known...
             //    if ( (ShowUserNamePostfix) && (string.IsNullOrEmpty(userNameAddition) == false))
             //        a.DisplayName = a.DisplayName + " [" + userNameAddition + "]";
             //    //a.From = string.Format("{0} <{1}@communitybridge.example.net>", EncodeHeaderText(a.DisplayName), a.UserGuid);
-            //    a.From = EncodeHeaderText(a.DisplayName, enc);
-            //}
-
-            // TODO: Mapping of "own-user" to e-mail, so newsreader can detect own articles
-
+                a.From = EncodeHeaderText(a.DisplayName, enc);
+            }
 
             // Check if we have something to do with the body...
             if (string.IsNullOrEmpty(a.Body))

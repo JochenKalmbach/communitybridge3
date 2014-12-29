@@ -117,16 +117,19 @@ namespace CommunityBridge3.ForumsRestService
             return res;
         }
 
-        public void PostReply(Guid threadId, string body, Guid? parentId = null, bool? alertMe = null)
+        public ThreadReply PostReply(Guid threadId, string body, Guid? parentId = null, bool? alertMe = null)
         {
             var data = new PostReply();
             data.ParentId = parentId;
             data.Body = body;
             data.AlertMe = alertMe;
 
-            DoPost<PostReply, Response<ThreadReply>>(string.Format(CultureInfo.InvariantCulture, "threads/{0}/replies", threadId), data);
+            Response<ThreadReply> res = DoPost<PostReply, Response<ThreadReply>>(string.Format(CultureInfo.InvariantCulture, "threads/{0}/replies", threadId), data);
+            if (res != null && res.Values.Count > 0)
+                return res.Values[0];
+            return null;
         }
-        public void PostThread(string forumName, string title, string body, bool? alertMe = null)
+        public Thread PostThread(string forumName, string title, string body, bool? alertMe = null)
         {
             var data = new PostThread();
             data.Forum = forumName;
@@ -134,7 +137,10 @@ namespace CommunityBridge3.ForumsRestService
             data.Body = body;
             data.AlertMe = alertMe;
 
-            DoPost<PostThread, Response<Thread>>("threads", data);
+            Response<Thread> res = DoPost<PostThread, Response<Thread>>("threads", data);
+            if (res != null && res.Values.Count > 0)
+                return res.Values[0];
+            return null;
         }
         #endregion
 
@@ -217,6 +223,7 @@ namespace CommunityBridge3.ForumsRestService
                 using (var s = new StreamReader(res.GetResponseStream()))
                 {
                     var json = s.ReadToEnd();
+                    Traces.WebService_TraceEvent(TraceEventType.Verbose, 1, string.Format("JSON-Response: {1}: {0}", req.RequestUri, json));
                     result = Deserialize<T>(json);
                 }
             }

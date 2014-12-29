@@ -94,13 +94,13 @@
         "Entry"
         {
         "MsmKey" = "8:_936E818EF2D9A5600978411F278E2661"
-        "OwnerKey" = "8:_9122975544FD48D094E22763FD0F2F07"
+        "OwnerKey" = "8:_6A2A249ABD32F0F95F12627044D846CC"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_936E818EF2D9A5600978411F278E2661"
-        "OwnerKey" = "8:_6A2A249ABD32F0F95F12627044D846CC"
+        "OwnerKey" = "8:_9122975544FD48D094E22763FD0F2F07"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -184,61 +184,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9122975544FD48D094E22763FD0F2F07"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8FAA6FCB521C41C7A81DF3C02CF381BF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_936E818EF2D9A5600978411F278E2661"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6A2A249ABD32F0F95F12627044D846CC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9CE3D7A98C1BBD8D7FB3F8D38CCD69F8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A4CCBB31AFD07E46F7869F69C79A2413"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_832E59E832CAC412BFC76EC42FEB21D0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B6792BC95FC51BCAAE9A236CB11687A3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C033F0968F3FF171439B69E619E5F5A9"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_89FBE11A0371C178BC5C7E79D4C893FE"
+        "OwnerKey" = "8:_57A7FA8F64D6D756E7F8FCD122972B43"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -250,7 +196,61 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_57A7FA8F64D6D756E7F8FCD122972B43"
+        "OwnerKey" = "8:_89FBE11A0371C178BC5C7E79D4C893FE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_C033F0968F3FF171439B69E619E5F5A9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_B6792BC95FC51BCAAE9A236CB11687A3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_832E59E832CAC412BFC76EC42FEB21D0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_A4CCBB31AFD07E46F7869F69C79A2413"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9CE3D7A98C1BBD8D7FB3F8D38CCD69F8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6A2A249ABD32F0F95F12627044D846CC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_936E818EF2D9A5600978411F278E2661"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8FAA6FCB521C41C7A81DF3C02CF381BF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9122975544FD48D094E22763FD0F2F07"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -405,11 +405,6 @@
             "AssemblyAsmDisplayName" = "8:ColorCode, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_57A7FA8F64D6D756E7F8FCD122972B43"
-                    {
-                    "Name" = "8:ColorCode.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:ColorCode.dll"
             "TargetName" = "8:"
@@ -436,11 +431,6 @@
             "AssemblyAsmDisplayName" = "8:System.Data.SqlServerCe.Entity, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_6A2A249ABD32F0F95F12627044D846CC"
-                    {
-                    "Name" = "8:System.Data.SqlServerCe.Entity.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Data.SqlServerCe.Entity.dll"
             "TargetName" = "8:"
@@ -487,11 +477,6 @@
             "AssemblyAsmDisplayName" = "8:CommunityBridge3.ForumsRestService, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_832E59E832CAC412BFC76EC42FEB21D0"
-                    {
-                    "Name" = "8:CommunityBridge3.ForumsRestService.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:CommunityBridge3.ForumsRestService.dll"
             "TargetName" = "8:"
@@ -518,11 +503,6 @@
             "AssemblyAsmDisplayName" = "8:CommunityBridge3.NNTPServer, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_89FBE11A0371C178BC5C7E79D4C893FE"
-                    {
-                    "Name" = "8:CommunityBridge3.NNTPServer.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:CommunityBridge3.NNTPServer.dll"
             "TargetName" = "8:"
@@ -662,11 +642,6 @@
             "AssemblyAsmDisplayName" = "8:Ionic.Zip, Version=1.9.1.8, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_9CE3D7A98C1BBD8D7FB3F8D38CCD69F8"
-                    {
-                    "Name" = "8:Ionic.Zip.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Ionic.Zip.dll"
             "TargetName" = "8:"
@@ -693,11 +668,6 @@
             "AssemblyAsmDisplayName" = "8:CommunityBridge3.LiveConnect, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_A4CCBB31AFD07E46F7869F69C79A2413"
-                    {
-                    "Name" = "8:CommunityBridge3.LiveConnect.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:CommunityBridge3.LiveConnect.dll"
             "TargetName" = "8:"
@@ -724,11 +694,6 @@
             "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_B6792BC95FC51BCAAE9A236CB11687A3"
-                    {
-                    "Name" = "8:Newtonsoft.Json.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Newtonsoft.Json.dll"
             "TargetName" = "8:"
@@ -755,11 +720,6 @@
             "AssemblyAsmDisplayName" = "8:CommunityBridge3.ArticleConverter, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_C033F0968F3FF171439B69E619E5F5A9"
-                    {
-                    "Name" = "8:CommunityBridge3.ArticleConverter.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:CommunityBridge3.ArticleConverter.dll"
             "TargetName" = "8:"
@@ -806,11 +766,6 @@
             "AssemblyAsmDisplayName" = "8:HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_C93A91888B5D52E2C74C8F215C98CF20"
-                    {
-                    "Name" = "8:HtmlAgilityPack.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:HtmlAgilityPack.dll"
             "TargetName" = "8:"
@@ -946,15 +901,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:CommunityBridge3"
-        "ProductCode" = "8:{B9C44DC9-F4EE-4541-91AA-8B2D97D9DEEB}"
-        "PackageCode" = "8:{E3D6E05B-E0DB-4910-B250-9B7952A53B2B}"
+        "ProductCode" = "8:{4D82B54B-1329-4F69-AFB8-CC9D332A8D4B}"
+        "PackageCode" = "8:{492870E4-4E27-4755-BB33-914AF97F26D6}"
         "UpgradeCode" = "8:{1F2DD04B-D841-4B2D-9CDC-A1B6322B3E72}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:3.0.0"
+        "ProductVersion" = "8:3.1.0"
         "Manufacturer" = "8:Community"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

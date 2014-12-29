@@ -74,7 +74,8 @@ namespace CommunityBridge3
             u._port = this._port;
             u._usePlainTextConverter = this._usePlainTextConverter;
             u._userEmail = this._userEmail;
-            u._userName = this._userName;
+            u._userGuid = this._userGuid;
+            //u._userName = this._userName;
 #if LIVECONNECT
           u.Scopes = this.Scopes;
           u.ClientId = this.ClientId;
@@ -208,8 +209,18 @@ namespace CommunityBridge3
                     s = GetString(r, "UserEmail");
                     UserEmail = s;
 
-                    s = GetString(r, "UserName");
-                    UserName = s;
+                    //s = GetString(r, "UserName");
+                    //UserName = s;
+
+                    s = GetString(r, "UserGuid");
+                    if (string.IsNullOrEmpty(s) == false)
+                    {
+                        try
+                        {
+                            UserGuid = new Guid(s);
+                        }
+                        catch { }
+                    }
 
 #if LIVECONNECT
                     s = GetString(r, "RefreshToken");
@@ -275,7 +286,9 @@ namespace CommunityBridge3
 
                     SetString(r, "UserEmail", UserEmail);
 
-                    SetString(r, "UserName", UserName);
+                    //SetString(r, "UserName", UserName);
+
+                    SetString(r, "UserGuid", UserGuid == null ? string.Empty : UserGuid.Value.ToString() );
 
 #if LIVECONNECT
                     SetString(r, "RefreshToken", RefreshToken);
@@ -492,7 +505,7 @@ namespace CommunityBridge3
         private string _userEmail = string.Empty;
         [Category("Header-Converter")]
         [DefaultValue("")]
-        [Description("Deprecated value, should not be used anymore... see UserMapping")]
+        [Description("Current user email, to detect own threads in your newsreader")]
         public string UserEmail
         {
             get {
@@ -503,19 +516,35 @@ namespace CommunityBridge3
             }
         }
 
-        private string _userName = string.Empty;
+        private Guid? _userGuid;
         [Category("Header-Converter")]
-        [DefaultValue("")]
-        [Description("Deprecated value, should not be used anymore... see UserMapping")]
-        public string UserName
+        [DefaultValue(null)]
+        [Description("Current user ID, to detect own threads in your newsreader")]
+        public Guid? UserGuid
         {
-            get {
-                return _userName;
+            get
+            {
+                return _userGuid;
             }
-            set {
-                _userName = value;
+            set
+            {
+                _userGuid = value;
             }
         }
+
+        //private string _userName = string.Empty;
+        //[Category("Header-Converter")]
+        //[DefaultValue("")]
+        //[Description("Deprecated value, should not be used anymore... see UserMapping")]
+        //public string UserName
+        //{
+        //    get {
+        //        return _userName;
+        //    }
+        //    set {
+        //        _userName = value;
+        //    }
+        //}
 
         private UsePlainTextConverters _usePlainTextConverter = UsePlainTextConverters.None;
         [Category("PlainText-Converter")]

@@ -809,7 +809,7 @@ namespace CommunityBridge3.NNTPServer
             return _cachedBodyResponseText;
         }
 
-        //#region NNTPBridge Special
+        #region NNTPBridge Special
 
         //public string Brand;
         //public bool? IsAdministrator;
@@ -819,13 +819,13 @@ namespace CommunityBridge3.NNTPServer
         //public int? PostsCount;
         //public int? AnwsersCount;
         //public int? Stars;
-        //public string UserEmail;
-        //public string DisplayName;  // The Username
-        //public Guid UserGuid;
+        public string UserEmail; // The email if available
+        public string DisplayName;  // The Username
+        public Guid? UserGuid;
 
         //public Guid Guid;
         //public Guid DiscussionId;
-        //#endregion
+        #endregion
     }  // class Article
 
     [Flags]
