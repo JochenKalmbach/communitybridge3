@@ -80,7 +80,7 @@ namespace CommunityBridge3.ArticleConverter
             // Find Newsreader Tag
             FindNewsreaderTag(a);
 
-            a.Subject = EncodeHeaderText(a.Subject, enc);
+            a.Subject = EncodeHeaderText(System.Web.HttpUtility.HtmlDecode(a.Subject), enc);
 
           //  // Fill out X-Comments:
           //  var xcommentsSb = new StringBuilder();
