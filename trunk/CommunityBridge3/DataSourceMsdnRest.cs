@@ -1058,9 +1058,12 @@ namespace CommunityBridge3
         {
             if (newArticles.Any() == false)
                 return;
+
             // Now, create a goood NNTP# and save it to the database...
             using (var con = _db.CreateConnection(group.GroupName))
             {
+                Stopwatch sw = Stopwatch.StartNew();
+
                 // Retrive the current maxNr:
                 int maxNr = group.LastArticle;
                 if (con.Mappings.Any())
@@ -1142,8 +1145,11 @@ namespace CommunityBridge3
                         idx++;
                     }
                 }
+                double processTime = sw.ElapsedMilliseconds;
 
                 con.SaveChanges(SaveOptions.None);
+
+                Traces.Main_TraceEvent(TraceEventType.Information, 1, string.Format("ProcessMessages: Cnt: {0}, Duration: {1} ms (processed: {2} ms)", articles.Count, sw.ElapsedMilliseconds, processTime));
             }
         }
 
@@ -1165,6 +1171,8 @@ namespace CommunityBridge3
             {
                 int maxPages = UserSettings.Default.MaxPagesOnGet;
                 //bool ascending = !(maxCntForFirstAccess != null);
+                // always descending, because we always want to get the newest first...
+                // even if we are weeks behind the last query...
                 res = group.Provider.GetThreads(group.ForumId, lastActivityFrom, false, null, maxPages);
             }
             catch (Exception exp)
@@ -1176,13 +1184,20 @@ namespace CommunityBridge3
                 throw;
             }
 
-            int idx = 0;
-            int maxIdx = res.Count();
 
-            //foreach (Thread thread in res)
+            Thread[] threads = res.ToArray();
+
+            // Now reverse the order, so we go from oldest to newest...
+            // If I get some trouble in-between, I have the older ones saved, and not yet the newest => the next time we will again query the older newer values...
+            Array.Reverse(threads);
+
+
+            int idx = 0;
+            int maxIdx = threads.Length;
+            //foreach (Thread thread in threads)
             //try
             //{
-                Parallel.ForEach(res,
+                Parallel.ForEach(threads,
                     new ParallelOptions { MaxDegreeOfParallelism = 4 },
                                  (thread, loopState) =>
                                  {

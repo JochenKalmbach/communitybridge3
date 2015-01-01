@@ -147,8 +147,30 @@ namespace CommunityBridge3
                 return null;
 
             var conStr = CeConnectionString.Replace("###DATABASE###", fn);
+            //var res = new NewsgroupsEntities(conStr);
 
-            return new NewsgroupsEntities(conStr);
+            // Give an open connection, so the EF4 will not always open and close the connection for each query...
+            var edmConnection = new System.Data.EntityClient.EntityConnection(conStr);
+            edmConnection.Open();
+            var res = new NewsgroupsEntities(edmConnection);
+
+            //res.Connection.StateChange +=
+            //    (sender, args) => System.Diagnostics.Debug.WriteLine("ConnectionState: {0} - {1}", args.CurrentState, ++ConCnt);
+            return res;
+        }
+
+        //private static int ConCnt;
+    }
+
+    public partial class NewsgroupsEntities
+    {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.Connection.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 
