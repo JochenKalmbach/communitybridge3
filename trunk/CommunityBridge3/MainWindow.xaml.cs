@@ -646,13 +646,18 @@ namespace CommunityBridge3
               System.Windows.Threading.DispatcherPriority.Normal,
               new Action(() =>
                            {
-                               lblInfo.Text = e.Newsgroup + ": " + e.Text;
-                               NewsgroupVM grp = _groupView.SourceCollection.Cast<NewsgroupVM>()
-                                           .FirstOrDefault(
-                                               p => string.Equals(p.Name, e.Newsgroup, StringComparison.OrdinalIgnoreCase));
-                               if (grp != null)
+                               if (_groupView != null)
                                {
-                                   grp.Message = e.Text;
+                                   lblInfo.Text = e.Newsgroup + ": " + e.Text;
+                                   NewsgroupVM grp = _groupView.SourceCollection.Cast<NewsgroupVM>()
+                                                               .FirstOrDefault(
+                                                                   p =>
+                                                                   string.Equals(p.Name, e.Newsgroup,
+                                                                                 StringComparison.OrdinalIgnoreCase));
+                                   if (grp != null)
+                                   {
+                                       grp.Message = e.Text;
+                                   }
                                }
                            }));
         }
