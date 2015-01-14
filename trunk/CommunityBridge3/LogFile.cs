@@ -42,7 +42,12 @@ namespace CommunityBridge3
 
         private readonly Queue<string> _queue = new Queue<string>();
         private readonly AutoResetEvent _event = new AutoResetEvent(false);
-        private const long MaxFileSize = 5 * 1024 * 1024;  // 5 MB
+        private const long MaxFileSize = 
+#if DEBUG
+            50 * 1024 * 1024;  // 50 MB
+#else
+            5 * 1024 * 1024;  // 5 MB
+#endif
         private readonly string _basePath;
         private object _WriterLock = new object();
 
@@ -108,11 +113,13 @@ namespace CommunityBridge3
                             }
                             if (msg != null)
                             {
+#if !DEBUG
                                 if ((msg.Length > 200)
                                   && (msg.IndexOf("Exception", StringComparison.Ordinal) < 0)
                                   && (msg.IndexOf("CheckTicket", StringComparison.Ordinal) < 0)
                                   )
                                     msg = msg.Substring(0, 200);
+#endif
 
                                 sw.WriteLine(msg);
                                 msgWritten = true;

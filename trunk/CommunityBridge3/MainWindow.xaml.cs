@@ -1035,10 +1035,7 @@ namespace CommunityBridge3
 
         string GetFileName()
         {
-            string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            dir = Path.Combine(dir, UserSettings.CompanyName);
-            dir = Path.Combine(dir, UserSettings.ProductName);
-            return Path.Combine(dir, "UICache.xml");
+            return Path.Combine(UserSettings.Default.BasePath, "UICache.xml");
         }
 
         private bool firstTime = true;

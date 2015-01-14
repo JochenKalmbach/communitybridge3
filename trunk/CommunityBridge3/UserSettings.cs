@@ -13,7 +13,7 @@ using Microsoft.Win32;
 
 namespace CommunityBridge3
 {
-    internal class UserSettings
+    public class UserSettings
     {
         static UserSettings()
         {
@@ -53,10 +53,29 @@ namespace CommunityBridge3
           ClientId = "000000004C133C0B";
 #endif
 
-            string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            dir = Path.Combine(dir, UserSettings.CompanyName);
-            dir = Path.Combine(dir, UserSettings.ProductName);
-          _basePath = dir;
+            // Check if we have a real protable version, which must store the data/settings in a subdirectory of the EXE
+            try
+            {
+                var exeAssembly = Assembly.GetExecutingAssembly();
+                if (exeAssembly != null)
+                {
+                    if (File.Exists(exeAssembly.Location + ".portable"))
+                    {
+                        string dirp = Path.Combine(Path.GetDirectoryName(exeAssembly.Location), "PortableData");
+                        _basePath = dirp;
+                        _IsPortable = true;
+                    }
+                }
+            }
+            catch { }
+
+            if (string.IsNullOrEmpty(_basePath))
+            {
+                string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                dir = Path.Combine(dir, UserSettings.CompanyName);
+                dir = Path.Combine(dir, UserSettings.ProductName);
+                _basePath = dir;
+            }
         }
 
 
@@ -66,9 +85,21 @@ namespace CommunityBridge3
         get { return _basePath; }
       }
 
+        private bool _IsPortable;
+        public bool IsPortable
+        {
+            get { return _IsPortable; }
+        }
+
         public UserSettings Clone()
         {
             var u = new UserSettings();
+            AssignTo(u);
+            return u;
+        }
+
+        private void AssignTo(UserSettings u)
+        {
             u._autoMinimize = this._autoMinimize;
             u._autoStart = this._autoStart;
             u._bindToWorld = this._bindToWorld;
@@ -93,8 +124,6 @@ namespace CommunityBridge3
             u.DisableArticleCache = this.DisableArticleCache;
             u._maxPagesOnGet = this._maxPagesOnGet;
             u.AsyncGroupUpdate = this.AsyncGroupUpdate;
-
-            return u;
         }
 
         private RegistryKey UserAppDataRegistryForWriting
@@ -161,8 +190,19 @@ namespace CommunityBridge3
         #region Load/Save
         void Load()
         {
+
             try
             {
+                if (IsPortable)
+                {
+                    UserSettings u = LoadFromXml(Path.Combine(BasePath, "Settings.xml"));
+                    if (u != null)
+                    {
+                        u.AssignTo(this);
+                    }
+                    return;
+                }
+
                 using(var r = UserAppDataRegistryForReading)
                 {
                     if (r == null) return;
@@ -274,6 +314,12 @@ namespace CommunityBridge3
         {
             try
             {
+                if (IsPortable)
+                {
+                    SaveToXml(Path.Combine(BasePath, "Settings.xml"));
+                    return;
+                }
+
                 using (var r = UserAppDataRegistryForWriting)
                 {
                     SetBoolean(r, "AutoStart", AutoStart);
@@ -747,6 +793,37 @@ namespace CommunityBridge3
         public bool AsyncGroupUpdate { get; set; }
 
         #endregion
+
+        #region XML Load/Save
+        private static UserSettings LoadFromXml(string fileName)
+        {
+            try
+            {
+                var ser = new XmlSerializer(typeof(UserSettings));
+                using (var sr = new StreamReader(fileName))
+                {
+                    var res = ser.Deserialize(sr) as UserSettings;
+                    return res;
+                }
+            }
+            catch { }
+            return null;
+        }
+        private void SaveToXml(string fileName)
+        {
+            try
+            {
+                var ser = new XmlSerializer(typeof(UserSettings));
+                using (var sr = new StreamWriter(fileName))
+                {
+                    ser.Serialize(sr, this);
+                }
+            }
+            catch { }
+        }
+
+        #endregion
+
     }  // class UserSettings
 
 

@@ -87,9 +87,11 @@ namespace CommunityBridge3.NNTPServer
         protected DataProvider()
         {
             MaxPostLengthBytes = 1048576;
-            _articlesCacheCheckTimer = new Timer {Interval = 30000};
+            _articlesCacheCheckTimer = new Timer {Interval = 30*60*1000};  // Every 30 Minutes...
             _articlesCacheCheckTimer.Start();
+#if !DEBUG
             _articlesCacheCheckTimer.Elapsed += _articlesCacheCheckTimer_Elapsed;
+#endif
         }
 
         void _articlesCacheCheckTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -102,7 +104,7 @@ namespace CommunityBridge3.NNTPServer
                     return;
                 maxArticlesPerGroup = maxArticles/this.GroupList.Count;
             }
-            maxArticlesPerGroup = Math.Max(100, maxArticlesPerGroup);
+            maxArticlesPerGroup = Math.Max(1000, maxArticlesPerGroup);
 
             // Now check each group and reduce the number of stored articles, if appropriate...))
             lock(GroupList)
