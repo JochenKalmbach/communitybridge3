@@ -164,6 +164,9 @@
       <LastGenOutput>Model1.Designer.cs</LastGenOutput>
     </EntityDeploy>
     <None Include="app.config" />
+    <None Include="CommunityBridge3.portable">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Model1.edmx.sqlce" />
     <None Include="Properties\DataSources\NewsgroupsEntities.datasource" />
   </ItemGroup>
