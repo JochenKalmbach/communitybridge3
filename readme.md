@@ -1,7 +1,13 @@
-**Project Description**
 Community project for accessing the MSDN-Forums (https://social.msdn.microsoft.com/Forums/en-US/home) with any NNTP client. It provides an NNTP server (bridge).
 
+# Latest build result
+
+[![build result](https://ci.appveyor.com/api/projects/status/github/JochenKalmbach/communitybridge3?branch=master&svg=true)](https://ci.appveyor.com/project/JochenKalmbach/communitybridge3)
+
+[Download latest Artifacts](https://ci.appveyor.com/project/JochenKalmbach/communitybridge3/build/artifacts)
+
 To use this bridge, you also need to enable the NNTP access on your profile page:
+
 # Go to "Quick access | My Settings | Be sure the "Use NNTP bridge" is checked and press "Save changes"
 See also: [http://social.msdn.microsoft.com/Forums/en-US/user](http://social.msdn.microsoft.com/Forums/en-US/user)
 
@@ -24,9 +30,11 @@ Microsoft is working on this, so in several couple of weeks, this should also be
 ## User interface
 
 The main user interface looks like:
+
 ![](assets/Bridge3_01.png)
 
 After the bridge is started, it tries to login with LiveConnect. Here you also need to give the NNTP-Bridge access to your informations and to allow login (offline-access).
+
 ![](assets/Bridge3_02.png)
 ![](assets/Bridge3_03.png)
 
