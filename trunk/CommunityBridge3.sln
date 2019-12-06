@@ -1,11 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.902
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityBridge3", "CommunityBridge3\CommunityBridge3.csproj", "{74FB3412-CB96-41A3-B859-5A3E8C0A4439}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityBridge3.NNTPServer", "CommunityBridge3.NNTPServer\CommunityBridge3.NNTPServer.csproj", "{573E698F-5858-40D7-A416-6574EE6AE73D}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CommunityBridge3.Setup", "CommunityBridge3.Setup\CommunityBridge3.Setup.vdproj", "{8CFDAC8A-EA6D-4E45-A862-45A968FAC00E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityBridge3.ArticleConverter", "CommunityBridge3.ArticleConverter\CommunityBridge3.ArticleConverter.csproj", "{641865B0-3DAB-4E84-9786-5ECEF74CBAE1}"
 EndProject
@@ -23,9 +23,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityBridge3.ForumsRestService", "CommunityBridge3.ForumsRestService\CommunityBridge3.ForumsRestService.csproj", "{6028F4AC-988A-4102-AC07-56DECFA03C8C}"
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = CommunityBridge3.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -55,12 +52,6 @@ Global
 		{573E698F-5858-40D7-A416-6574EE6AE73D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{573E698F-5858-40D7-A416-6574EE6AE73D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{573E698F-5858-40D7-A416-6574EE6AE73D}.Release|x86.ActiveCfg = Release|Any CPU
-		{8CFDAC8A-EA6D-4E45-A862-45A968FAC00E}.Debug|Any CPU.ActiveCfg = Debug
-		{8CFDAC8A-EA6D-4E45-A862-45A968FAC00E}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{8CFDAC8A-EA6D-4E45-A862-45A968FAC00E}.Debug|x86.ActiveCfg = Debug
-		{8CFDAC8A-EA6D-4E45-A862-45A968FAC00E}.Release|Any CPU.ActiveCfg = Release
-		{8CFDAC8A-EA6D-4E45-A862-45A968FAC00E}.Release|Mixed Platforms.ActiveCfg = Release
-		{8CFDAC8A-EA6D-4E45-A862-45A968FAC00E}.Release|x86.ActiveCfg = Release
 		{641865B0-3DAB-4E84-9786-5ECEF74CBAE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{641865B0-3DAB-4E84-9786-5ECEF74CBAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{641865B0-3DAB-4E84-9786-5ECEF74CBAE1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -104,5 +95,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A8FE7A47-1A43-4799-8E83-DE35A29DC7AC}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = CommunityBridge3.vsmdi
 	EndGlobalSection
 EndGlobal
